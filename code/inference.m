@@ -1,7 +1,11 @@
 function inference()
+  pkg load statistics;
+
 %Inference for the metapopulation SEIR model
 %Programmed by Sen Pei
 load M %load mobility
+
+size(M);
 load pop %load population
 Td=9;%average reporting delay
 a=1.85;%shape parameter of gamma distribution
@@ -38,6 +42,7 @@ SIG=(paramax-paramin).^2/4;%initial covariance of parameters
 lambda=1.1;%inflation parameter to aviod divergence within each iteration
 %start iteration for Iter round
 for n=1:Iter
+    printf( "iter = %d\n", n);
     sig(n)=alp^(n-1);
     %generate new ensemble members using multivariate normal distribution
     Sigma=diag(sig(n)^2*SIG);
@@ -70,7 +75,8 @@ for n=1:Iter
         for k=1:num_ens
             for l=1:num_loc
                 if obs_cnt(l,k)>0
-                    rnd=datasample(rnds,obs_cnt(l,k));
+                    # rnd=datasample(rnds,obs_cnt(l,k));
+                    rnd=randsample(rnds,obs_cnt(l,k));
                     for h=1:length(rnd)
                         if (t+rnd(h)<=num_times)
                             obs_temp(l,k,t+rnd(h))=obs_temp(l,k,t+rnd(h))+1;
@@ -104,6 +110,7 @@ for n=1:Iter
                 idx=neighbors(i);
                 for j=1:5
                     A=cov(x((idx-1)*5+j,:),obs_ens(l,:));
+                    printf("%e",A(1));
                     rr((idx-1)*5+j)=A(2,1)/prior_var;
                 end
             end
@@ -128,6 +135,8 @@ end
 parameters=theta(:,end);%estimated parameters
 
 save('parameters','parameters');
+
+endfunction
 
 function x = checkbound_ini(x,pop)
 %S,E,Is,Ia,obs,...,beta,mu,theta,Z,alpha,D
@@ -159,8 +168,10 @@ for i=1:6
     index_out=find(index>0);
     index_in=find(index==0);
     %redistribute out bound ensemble members
-    x(end-6+i,index_out)=datasample(x(end-6+i,index_in),length(index_out));
+    %x(end-6+i,index_out)=datasample(x(end-6+i,index_in),length(index_out));
+    x(end-6+i,index_out)=randsample(x(end-6+i,index_in),length(index_out));
 end
+endfunction
 
 function x = checkbound(x,pop)
 %S,E,Is,Ia,obs,...,beta,mu,theta,Z,alpha,D
@@ -186,7 +197,10 @@ for i=1:num_loc
     %obs
     x((i-1)*5+5,x((i-1)*5+5,:)<0)=0;
 end
+
 for i=1:6
     x(end-6+i,x(end-6+i,:)<xmin(i))=xmin(i)*(1+0.1*rand(sum(x(end-6+i,:)<xmin(i)),1));
     x(end-6+i,x(end-6+i,:)>xmax(i))=xmax(i)*(1-0.1*rand(sum(x(end-6+i,:)>xmax(i)),1));
 end
+
+endfunction
