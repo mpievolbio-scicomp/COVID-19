@@ -18,7 +18,7 @@ jhu_data_raw = pandas.read_csv("../JHU_data/csse_covid_19_data/csse_covid_19_tim
 cases_germany = jhu_data_raw[jhu_data_raw["Country/Region"]=="Germany"].iloc[:,-15:].values[0]
 cases_world = jhu_data_raw.iloc[:,-15:].sum()
 dates = cases_world.index
-germany_vs_world = [{"Germany":g, "World":w} for g,w in zip(cases_germany, cases_world.values)]
+germany_vs_world = [{"Germany":g, "World":w-g} for g,w in zip(cases_germany, cases_world.values)]
 data_for_sim = pandas.DataFrame(index=dates, columns=["Germany","World"], data=germany_vs_world, )
 data_for_sim.set_index(data_for_sim.index.rename("Date"),inplace=True)
 data_for_sim.to_csv("Incidence.csv")
