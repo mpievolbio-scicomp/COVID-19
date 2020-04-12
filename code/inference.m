@@ -37,6 +37,9 @@ alp=0.9;%variance shrinking rate
 SIG=(paramax-paramin).^2/4;%initial covariance of parameters
 lambda=1.1;%inflation parameter to aviod divergence within each iteration
 %start iteration for Iter round
+
+fprintf("#### Starting iterations. ####\n");
+
 for n=1:Iter
     sig(n)=alp^(n-1);
     %generate new ensemble members using multivariate normal distribution
@@ -58,15 +61,16 @@ for n=1:Iter
     x_post=zeros(num_var,num_ens,num_times);%posterior
     pop=pop0;
     obs_temp=zeros(num_loc,num_ens,num_times);%records of reported cases
+
     for t=1:num_times
-        [n,t]
+        fprintf("## n = %d\tt = %d\n", n,t);
         %inflation
         x=mean(x,2)*ones(1,num_ens)+lambda*(x-mean(x,2)*ones(1,num_ens));
         x=checkbound(x,pop);
         %integrate forward
         [x,pop]=SEIR(x,M,pop,t,pop0);
         obs_cnt=H*x;%new infection
-        %add reporting delay
+        % add reporting delay
         for k=1:num_ens
             for l=1:num_loc
                 if obs_cnt(l,k)>0
@@ -125,7 +129,17 @@ for n=1:Iter
     theta(:,n+1)=mean(temp,2);%average over time
 end
 
+
 parameters=theta(:,end);%estimated parameters
+
+fprintf("# b : transmission of reported infections\n");
+fprintf("# u : relative transmission from unreported infected patients\n");
+fprintf("# q : mobility adjustment factor\n");
+fprintf("# Z : mean latency period\n");
+fprintf("# a : fraction of infections that develop severe symptoms\n");
+fprintf("# D : average duration of infection\n");
+fprintf("# b\tu\tq\tZ\ta\tD\n");
+disp(parameters');
 
 save('parameters','parameters');
 
