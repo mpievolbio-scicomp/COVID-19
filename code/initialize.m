@@ -10,7 +10,7 @@ Elow=0;Eup=0;%exposed
 Irlow=0;Irup=0;%documented infection
 Iulow=0;Iuup=0;%undocumented infection
 obslow=0;obsup=0;%reported case
-betalow=0.8;betaup=1.5;%transmission rate
+betalow=0.2;betaup=1.5;%transmission rate
 mulow=0.2;muup=1.0;%relative transmissibility
 thetalow=1;thetaup=1.00;%movement factor
 Zlow=2;Zup=5;%latency period
@@ -31,11 +31,11 @@ paramin=xmin(end-5:end);
 %Germany - 1
 seedid=1;
 %E
-xmin((seedid-1)*5+2)=0;xmax((seedid-1)*5+2)=250000;
+xmin((seedid-1)*5+2)=0;xmax((seedid-1)*5+2)=10;
 %Is
-xmin((seedid-1)*5+3)=0;xmax((seedid-1)*5+3)=50871;
+xmin((seedid-1)*5+3)=0;xmax((seedid-1)*5+3)=0;
 %Ia
-xmin((seedid-1)*5+4)=0;xmax((seedid-1)*5+4)=250000-50871;
+xmin((seedid-1)*5+4)=0;xmax((seedid-1)*5+4)=10;
 %Latin Hypercubic Sampling
 x=lhsu(xmin,xmax,num_ens);
 x=x';

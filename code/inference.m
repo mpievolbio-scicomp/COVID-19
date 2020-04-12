@@ -1,8 +1,11 @@
 function inference()
 %Inference for the metapopulation SEIR model
 %Programmed by Sen Pei
-load M %load mobility
-load pop %load population
+% load M %load mobility
+M = zeros(1,1,55);
+% load pop %load population
+pop = zeros(1,1);
+pop(:,1) = 8.3e7;
 Td=9;%average reporting delay
 a=1.85;%shape parameter of gamma distribution
 b=Td/a;%scale parameter of gamma distribution
