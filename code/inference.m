@@ -1,8 +1,12 @@
 function inference()
 %Inference for the metapopulation SEIR model
 %Programmed by Sen Pei
+cases = readtable('germany_22520-31620.csv');
+incidence = cases.Germany; %load observation
 % load M %load mobility
-M = zeros(1,1,55);
+incidence_shape = size(incidence);
+num_days = incidence_shape(1);
+M = zeros(1,1,num_days);
 % load pop %load population
 pop = zeros(1,1);
 pop(:,1) = 8.3e7;
@@ -16,7 +20,7 @@ H=zeros(num_loc,5*num_loc+6);
 for i=1:num_loc
     H(i,(i-1)*5+5)=1;
 end
-load incidence %load observation
+
 num_times=size(incidence,1);
 obs_truth=incidence';
 %set OEV
@@ -28,7 +32,7 @@ for l=1:num_loc
 end
 num_ens=300;%number of ensemble
 pop0=pop*ones(1,num_ens);
-[x,paramax,paramin]=initialize(pop0,num_ens);%get parameter range
+[x,paramax,paramin]=initialize(pop0,M,num_ens);%get parameter range
 num_var=size(x,1);%number of state variables
 %IF setting
 Iter=10;%number of iterations
@@ -49,11 +53,11 @@ for n=1:Iter
     Sigma=diag(sig(n)^2*SIG);
     if (n==1)
         %first guess of state space
-        [x,~,~]=initialize(pop0,num_ens);
+        [x,~,~]=initialize(pop0,M,num_ens);
         para=x(end-5:end,:);
         theta(:,1)=mean(para,2);%mean parameter
     else
-        [x,~,~]=initialize(pop0,num_ens);
+        [x,~,~]=initialize(pop0,M,num_ens);
         para=mvnrnd(theta(:,n)',Sigma,num_ens)';%generate parameters
         x(end-5:end,:)=para;
     end
@@ -146,14 +150,17 @@ disp(parameters');
 
 save('parameters','parameters');
 
+end
+
 function x = checkbound_ini(x,pop)
 %S,E,Is,Ia,obs,...,beta,mu,theta,Z,alpha,D
-betalow=0.8;betaup=1.5;%transmission rate
-mulow=0.2;muup=1.0;%relative transmissibility
-thetalow=1;thetaup=1.75;%movement factor
-Zlow=2;Zup=5;%latency period
-alphalow=0.02;alphaup=1.0;%reporting rate
-Dlow=2;Dup=5;%infectious period
+% betalow=0.2;betaup=1.5;%transmission rate
+% mulow=0.2;muup=1.0;%relative transmissibility
+% thetalow=1;thetaup=1.0;%movement factor
+% Zlow=2;Zup=5;%latency period
+% alphalow=0.02;alphaup=1.0;%reporting rate
+% Dlow=2;Dup=5;%infectious period
+[betalow,betaup,mulow,muup, thetalow, thetaup, Zlow, Zup, alphalow, alphaup, Dlow, Dup] = init_parameters();
 xmin=[betalow;mulow;thetalow;Zlow;alphalow;Dlow];
 xmax=[betaup;muup;thetaup;Zup;alphaup;Dup];
 num_loc=size(pop,1);
@@ -179,14 +186,17 @@ for i=1:6
     x(end-6+i,index_out)=datasample(x(end-6+i,index_in),length(index_out));
 end
 
+end
+
 function x = checkbound(x,pop)
 %S,E,Is,Ia,obs,...,beta,mu,theta,Z,alpha,D
-betalow=0.8;betaup=1.5;%transmission rate
-mulow=0.2;muup=1.0;%relative transmissibility
-thetalow=1;thetaup=1.75;%movement factor
-Zlow=2;Zup=5;%latency period
-alphalow=0.02;alphaup=1.0;%reporting rate
-Dlow=2;Dup=5;%infectious period
+% betalow=0.2;betaup=1.5;%transmission rate
+% mulow=0.2;muup=1.0;%relative transmissibility
+% thetalow=1;thetaup=1.0;%movement factor
+% Zlow=3;Zup=10;%latency period
+% alphalow=0.02;alphaup=1.0;%reporting rate
+% Dlow=2;Dup=5;%infectious period
+[betalow,betaup,mulow,muup, thetalow, thetaup, Zlow, Zup, alphalow, alphaup, Dlow, Dup] = init_parameters();
 xmin=[betalow;mulow;thetalow;Zlow;alphalow;Dlow];
 xmax=[betaup;muup;thetaup;Zup;alphaup;Dup];
 num_loc=size(pop,1);
@@ -207,3 +217,9 @@ for i=1:6
     x(end-6+i,x(end-6+i,:)<xmin(i))=xmin(i)*(1+0.1*rand(sum(x(end-6+i,:)<xmin(i)),1));
     x(end-6+i,x(end-6+i,:)>xmax(i))=xmax(i)*(1-0.1*rand(sum(x(end-6+i,:)>xmax(i)),1));
 end
+
+end
+
+
+
+

@@ -1,21 +1,18 @@
-function [x,paramax,paramin]=initialize(pop,num_ens)
+function [x,paramax,paramin]=initialize(pop,M,num_ens)
 %Initialize the metapopulation SEIRS model
-load M %load mobility
+%load M %load mobility
 num_loc=size(pop,1);
 % num_var=5*num_loc+6;
 % S,E,Is,Ia,obs,...,beta,mu,theta,Z,alpha,D
 % prior range
 Slow=1.0;Sup=1.0;%susceptible fraction
 Elow=0;Eup=0;%exposed
-Irlow=0;Irup=0;%documented infection
-Iulow=0;Iuup=0;%undocumented infection
+Irlow=0;Irup=0.0;%documented infection
+Iulow=0;Iuup=0.0;%undocumented infection
 obslow=0;obsup=0;%reported case
-betalow=0.2;betaup=1.5;%transmission rate
-mulow=0.2;muup=1.0;%relative transmissibility
-thetalow=1;thetaup=1.00;%movement factor
-Zlow=2;Zup=5;%latency period
-alphalow=0.02;alphaup=1.0;%reporting rate
-Dlow=2;Dup=5;%infectious period
+
+[betalow,betaup,mulow,muup, thetalow, thetaup, Zlow, Zup, alphalow, alphaup, Dlow, Dup] = init_parameters();
+
 %range of model state including variables and parameters
 xmin=[];
 xmax=[];
@@ -31,11 +28,15 @@ paramin=xmin(end-5:end);
 %Germany - 1
 seedid=1;
 %E
-xmin((seedid-1)*5+2)=0;xmax((seedid-1)*5+2)=10;
+xmin((seedid-1)*5+2)=100;
+xmax((seedid-1)*5+2)=100;
 %Is
-xmin((seedid-1)*5+3)=0;xmax((seedid-1)*5+3)=0;
+xmin((seedid-1)*5+3)=17;
+xmax((seedid-1)*5+3)=17;
 %Ia
-xmin((seedid-1)*5+4)=0;xmax((seedid-1)*5+4)=10;
+xmin((seedid-1)*5+4)=83;
+xmax((seedid-1)*5+4)=83;
+
 %Latin Hypercubic Sampling
 x=lhsu(xmin,xmax,num_ens);
 x=x';

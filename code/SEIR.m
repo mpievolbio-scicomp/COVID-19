@@ -229,10 +229,12 @@ pop=pop-sum(M(:,:,ts),1)'*theta+sum(M(:,:,ts),2)*theta;
 minfrac=0.6;
 pop(pop<minfrac*pop0)=pop0(pop<minfrac*pop0)*minfrac;
 
-S_fname = strcat('S_t',int2str(ts));
-E_fname = strcat('E_t',int2str(ts));
-Is_fname = strcat('Is_t',int2str(ts));
-Ia_fname = strcat('Ia_t',int2str(ts));
+out='out';
+S_fname = strcat(out,'/S_t',int2str(ts));
+E_fname = strcat(out,'/E_t',int2str(ts));
+Is_fname = strcat(out,'/Is_t',int2str(ts));
+Ia_fname = strcat(out,'/Ia_t',int2str(ts));
+
 save(S_fname,'S');
 save(E_fname, 'E');
 save(Is_fname,'Is');
