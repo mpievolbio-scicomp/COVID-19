@@ -28,14 +28,14 @@ paramin=xmin(end-5:end);
 %Germany - 1
 seedid=1;
 %E
-xmin((seedid-1)*5+2)=100;
-xmax((seedid-1)*5+2)=100;
+xmin((seedid-1)*5+2)=0;
+xmax((seedid-1)*5+2)=2000;
 %Is
 xmin((seedid-1)*5+3)=17;
 xmax((seedid-1)*5+3)=17;
 %Ia
-xmin((seedid-1)*5+4)=83;
-xmax((seedid-1)*5+4)=83;
+xmin((seedid-1)*5+4)=0;
+xmax((seedid-1)*5+4)=2000;
 
 %Latin Hypercubic Sampling
 x=lhsu(xmin,xmax,num_ens);
@@ -48,10 +48,11 @@ C=M(:,seedid,1);%first day
 for i=1:num_loc
     if i~=seedid
         %E
-        Elocus=x((seedid-1)*5+2,:);
+        Elocus=x((seedid-1)*5+2,:)
         x((i-1)*5+2,:)=round(C(i)*3*Elocus/pop(seedid));
+        % Is ???
         %Ia
-        Ialocus=x((seedid-1)*5+4,:);
+        Ialocus=x((seedid-1)*5+4,:)
         x((i-1)*5+4,:)=round(C(i)*3*Ialocus/pop(seedid));
     end
 end
